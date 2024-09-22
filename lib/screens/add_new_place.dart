@@ -1,18 +1,24 @@
+import 'dart:io';
+
 import 'package:favouriteplaces/models/place.dart';
 import 'package:favouriteplaces/providers/place_provider.dart';
+import 'package:favouriteplaces/widgets/image_input.dart';
+import 'package:favouriteplaces/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AddNewPlace extends ConsumerWidget {
   String? _title;
+  File? _selectedImage;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   AddNewPlace({super.key});
 
   void _saveItem(WidgetRef ref, BuildContext context) {
+    if (_selectedImage == null) return;
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       ref.read(placeNotifierProvider.notifier).addPlace(
-            Place(title: _title!),
+            Place(title: _title!, image: _selectedImage!),
           );
       Navigator.of(context).pop();
     }
@@ -46,7 +52,17 @@ class AddNewPlace extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
+                ),
+                ImageInput(onSelectImage: (File image) {
+                  _selectedImage = image;
+                }),
+                const SizedBox(
+                  height: 10,
+                ),
+                const LocationInput(),
+                const SizedBox(
+                  height: 10,
                 ),
                 ElevatedButton.icon(
                   onPressed: () {

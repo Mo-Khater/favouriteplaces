@@ -56,12 +56,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) {
-                              return PlaceScreen(title: favPlaces[index].title);
+                              return PlaceScreen(place: favPlaces[index]);
                             },
                           ),
                         );
                       },
                       child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: FileImage(favPlaces[index].image),
+                        ),
                         title: Text(
                           favPlaces[index].title,
                           style: Theme.of(context)
