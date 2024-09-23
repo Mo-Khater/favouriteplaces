@@ -1,8 +1,11 @@
+import 'package:favouriteplaces/models/place.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  final void Function(PlaceLocation placeLocation) onSelectPlaceLocation;
+
+  const LocationInput({super.key, required this.onSelectPlaceLocation});
   @override
   State<LocationInput> createState() {
     return _LocationInputState();
@@ -10,7 +13,7 @@ class LocationInput extends StatefulWidget {
 }
 
 class _LocationInputState extends State<LocationInput> {
-  Location? currentLocation;
+  PlaceLocation? currentLocation;
   bool isGettingLocation = false;
   void _getCurrentLocation() async {
     Location location = Location();
@@ -42,7 +45,18 @@ class _LocationInputState extends State<LocationInput> {
     locationData = await location.getLocation();
 
     setState(() {
-      isGettingLocation = true;
+      isGettingLocation = false;
+    });
+
+    if (locationData.latitude == null) return;
+    double lat = locationData.latitude!;
+    double lng = locationData.longitude!;
+    widget.onSelectPlaceLocation(
+        PlaceLocation(lat: lat, lng: lng, address: 'kafr shokr elqalubia'));
+
+    setState(() {
+      currentLocation =
+          PlaceLocation(lat: lat, lng: lng, address: 'kafr shokr elqalubia');
     });
   }
 
@@ -54,6 +68,15 @@ class _LocationInputState extends State<LocationInput> {
     );
     if (isGettingLocation) {
       review = const CircularProgressIndicator();
+    }
+
+    if (currentLocation != null) {
+      review = Image.asset(
+        'lib/assets/images/profilephoto.jpg',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
     }
 
     return Column(

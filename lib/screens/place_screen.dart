@@ -19,6 +19,34 @@ class PlaceScreen extends StatelessWidget {
             height: double.infinity,
             fit: BoxFit.cover,
           ),
+          Positioned(
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 70,
+                    backgroundImage:
+                        AssetImage('lib/assets/images/profilephoto.jpg'),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Colors.transparent, Colors.black54],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
+                    child: Text(
+                      place.placeLocation.address,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  )
+                ],
+              ))
         ],
       ),
     );

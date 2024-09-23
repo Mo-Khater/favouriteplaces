@@ -17,6 +17,14 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
+  late Future<void> _places;
+
+  @override
+  void initState() {
+    super.initState();
+    _places = ref.read(placeNotifierProvider.notifier).loadData();
+  }
+
   void removeItem(Place place) {
     ref.watch(placeNotifierProvider.notifier).removePlace(place);
   }
@@ -43,55 +51,78 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
         ],
       ),
-      body: favPlaces.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(8),
-              child: ListView.builder(
-                itemCount: favPlaces.length,
-                itemBuilder: (ctx, index) {
-                  return Dismissible(
-                    key: ValueKey(favPlaces[index].id),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) {
-                              return PlaceScreen(place: favPlaces[index]);
-                            },
-                          ),
-                        );
-                      },
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: FileImage(favPlaces[index].image),
+      body: FutureBuilder(
+          future: _places,
+          builder: (ctx, snapshot) {
+            return snapshot.connectionState == ConnectionState.waiting
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : favPlaces.isNotEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ListView.builder(
+                          itemCount: favPlaces.length,
+                          itemBuilder: (ctx, index) {
+                            return Dismissible(
+                              key: ValueKey(favPlaces[index].id),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (ctx) {
+                                        return PlaceScreen(
+                                            place: favPlaces[index]);
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage:
+                                        FileImage(favPlaces[index].image),
+                                  ),
+                                  title: Text(
+                                    favPlaces[index].title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface),
+                                  ),
+                                  subtitle: Text(
+                                    favPlaces[index].placeLocation.address,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface),
+                                  ),
+                                ),
+                              ),
+                              onDismissed: (direction) {
+                                removeItem(favPlaces[index]);
+                              },
+                            );
+                          },
                         ),
-                        title: Text(
-                          favPlaces[index].title,
+                      )
+                    : Center(
+                        child: Text(
+                          'No places try add one',
                           style: Theme.of(context)
                               .textTheme
-                              .titleMedium!
+                              .bodyLarge!
                               .copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onSurface),
                         ),
-                      ),
-                    ),
-                    onDismissed: (direction) {
-                      removeItem(favPlaces[index]);
-                    },
-                  );
-                },
-              ),
-            )
-          : Center(
-              child: Text(
-                'No places try add one',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
-              ),
-            ),
+                      );
+          }),
     );
   }
 }
